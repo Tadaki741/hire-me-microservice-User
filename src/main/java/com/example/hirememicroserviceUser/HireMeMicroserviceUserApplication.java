@@ -7,6 +7,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class HireMeMicroserviceUserApplication {
 
 	public static void main(String[] args) {
+
+		//Initialize firebase sdk
+
+
+
 		SpringApplication.run(HireMeMicroserviceUserApplication.class, args);
 	}
 
