@@ -1,5 +1,6 @@
 package com.example.hirememicroserviceUser.controller;
 
+import com.example.hirememicroserviceUser.model.LoginBody;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
