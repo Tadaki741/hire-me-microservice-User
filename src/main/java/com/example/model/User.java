@@ -1,36 +1,36 @@
 package com.example.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 
-@Entity
-@Table(name = "users")
+
+@Entity(name = "user")
+@Setter
+@Getter
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private String id;
     @Column
     private String email;
     @Column
     private Boolean isRecruiter;
-    @Column
-    private String customer;
+
 
     public User() {}
-
-    public User(String customer) {
-        this.customer = customer;
-    }
 
     public User(String email, Boolean isRecruiter) {
         this.email = email;
         this.isRecruiter = isRecruiter;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

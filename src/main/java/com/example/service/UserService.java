@@ -34,7 +34,12 @@ public class UserService implements UserRepository {
     // Save operation.
     @Override
     public void save(final User user) {
-        userDBRepository.save(user);
+
+        //Update data to redis
+        hashOperations.put("USER_CACHE", user.getId().toString(), user);
+
+        //save to database
+        this.userDBRepository.save(user);
     }
 
     @Override
