@@ -10,9 +10,9 @@
 	</parent>
 	<groupId>com.example</groupId>
 	<artifactId>hire-me-microservice-User</artifactId>
-	<version>0.0.1</version>
+	<version>0.0.1-SNAPSHOT</version>
 	<name>hire-me-microservice-User</name>
-	<description>Demo project for Spring Boot</description>
+	<description>Backend for hire-me application for User</description>
 	<properties>
 		<java.version>11</java.version>
 	</properties>
@@ -41,13 +41,6 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-
-		<dependency>
-			<groupId>com.google.firebase</groupId>
-			<artifactId>firebase-admin</artifactId>
-			<version>9.1.1</version>
-		</dependency>
-
 	</dependencies>
 
 	<build>
