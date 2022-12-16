@@ -20,7 +20,7 @@ public class HireMeMicroserviceUserApplication {
         try {
             //Initialize the firebase SDK
             ClassLoader classLoader = HireMeMicroserviceUserApplication.class.getClassLoader();
-            File file = new File(Objects.requireNonNull(classLoader.getResource("")).getFile());
+            File file = new File(Objects.requireNonNull(classLoader.getResource("serviceAccountKey.json")).getFile());
             FileInputStream serviceAccount = new FileInputStream(file.getAbsolutePath());
 
             FirebaseOptions options = FirebaseOptions.builder()
