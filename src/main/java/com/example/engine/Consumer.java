@@ -17,22 +17,19 @@ public class Consumer {
     private final Logger logger = LoggerFactory.getLogger(Consumer.class);
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private UserDBRepository userDBRepository;
 
     @KafkaListener(topics = "users", groupId = "group_id")
-    public void consume(String message) throws IOException {
-        logger.info(String.format("#### -> Consumed message -> %s", message));
+    public void consume(User user) throws IOException {
+        logger.info(String.format("#### -> Consumed user -> %s", user));
 
         //save message to database
-        User user = new User(message);
+        User newUser = new User(user.getEmail(),user.getRecruiter());
 
 //        this.cityRepository.save(city);
-        this.userDBRepository.save(user);
+        this.userDBRepository.save(newUser);
 
-        logger.info(String.format("#### -> ID message -> %s", user.getId()));
+        logger.info(String.format("#### -> New user created -> %s", newUser.getId()));
 
     }
 }
