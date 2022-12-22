@@ -1,8 +1,8 @@
-package com.example.service;
+package com.example.hirememicroserviceUser.service;
 
-import com.example.model.User;
-import com.example.repository.UserDBRepository;
-import com.example.repository.UserRepository;
+import com.example.hirememicroserviceUser.model.User;
+import com.example.hirememicroserviceUser.repository.UserDBRepository;
+import com.example.hirememicroserviceUser.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
