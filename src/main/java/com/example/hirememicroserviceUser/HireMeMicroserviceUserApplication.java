@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Objects;
 
 @SpringBootApplication
@@ -18,8 +19,7 @@ public class HireMeMicroserviceUserApplication {
 
 		//Initialize firebase sdk
 		ClassLoader classLoader = HireMeMicroserviceUserApplication.class.getClassLoader();
-		File file = new File(Objects.requireNonNull(classLoader.getResource("serviceAccountKey.json")).getFile());
-		FileInputStream serviceAccount = new FileInputStream(file.getAbsolutePath());
+        InputStream serviceAccount = classLoader.getResourceAsStream("serviceAccountKey.json");
 
 		//Firebase
 		FirebaseOptions options = FirebaseOptions.builder()

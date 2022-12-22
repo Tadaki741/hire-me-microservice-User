@@ -1,0 +1,35 @@
+services:
+  db:
+    image: postgres:9.6.2-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: microservice-user
+    volumes:
+      - postgres_db:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "25432:5432"
+  hire-me-microservice-user:
+    image: hire-me-microservice-user
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hire-me-microservice-user
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/microservice-user
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=123456
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_db:
