@@ -1,4 +1,4 @@
-package com.example.model;
+package com.example.hirememicroserviceUser.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

@@ -1,6 +1,6 @@
-package com.example.repository;
+package com.example.hirememicroserviceUser.repository;
 
-import com.example.model.User;
+import com.example.hirememicroserviceUser.model.User;
 
 import java.util.Map;
 

@@ -1,8 +1,8 @@
 package com.example.hirememicroserviceUser.controller;
 
-import com.example.model.LoginBody;
-import com.example.model.User;
-import com.example.service.UserService;
+import com.example.hirememicroserviceUser.model.LoginBody;
+import com.example.hirememicroserviceUser.model.User;
+import com.example.hirememicroserviceUser.service.UserService;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
@@ -11,12 +11,13 @@ import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Map;
 
-@RestController
+@Controller
 public class UserController {
 
     private static final Logger LOG = LoggerFactory.getLogger(UserController.class);

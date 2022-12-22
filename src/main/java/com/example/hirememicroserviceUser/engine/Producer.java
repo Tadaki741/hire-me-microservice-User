@@ -1,6 +1,6 @@
-package com.example.engine;
+package com.example.hirememicroserviceUser.engine;
 
-import com.example.model.User;
+import com.example.hirememicroserviceUser.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
