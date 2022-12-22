@@ -1,3 +1,6 @@
+Run `docker-compose up` to spin up the all with database
+
+-----
 Step to build Docker with Spring Boot. This is only for documentation of the steps involved in spinning a Spring Boot app in Docker container. You don't have to follow them.
 
 1. Create JAR file
