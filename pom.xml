@@ -12,7 +12,7 @@
 	<artifactId>hire-me-microservice-User</artifactId>
 	<version>0.0.1</version>
 	<name>hire-me-microservice-User</name>
-	<description>Demo project for Spring Boot</description>
+	<description>Backend for hire-me application for User</description>
 	<properties>
 		<java.version>11</java.version>
 	</properties>
