@@ -2,17 +2,16 @@ package com.example.hirememicroserviceUser.service;
 
 import com.example.hirememicroserviceUser.model.User;
 import com.example.hirememicroserviceUser.repository.UserDBRepository;
-import com.example.hirememicroserviceUser.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.Map;
+import java.util.List;
 
 @Service
-public class UserService implements UserRepository {
+public class UserService {
     private final String USER_CACHE = "USER";
 
     @Autowired
@@ -32,55 +31,41 @@ public class UserService implements UserRepository {
     }
 
     // Save operation.
-    @Override
     public void save(final User user) {
 
         //Update data to redis
-        hashOperations.put("USER_CACHE", user.getId().toString(), user);
+        this.saveUserToCache(user);
 
         //save to database
         this.userDBRepository.save(user);
     }
 
-    @Override
-    public void saveToCache(final User user) {
-        hashOperations.put(USER_CACHE, user.getEmail(), user);
+    public void saveUserToCache(final User user) {
+        hashOperations.put(USER_CACHE, user.getId(), user);
     }
 
-    @Override
     public User findByEmail(String email) {
         User redisUser = hashOperations.get(USER_CACHE, email);
         if (redisUser != null) return redisUser;
-        else {
-            User user = this.getUser(email);
-            saveToCache(user);
-            return user;
-        }
-    }
-
-    // Find by employee email operation.
-    private User getUser(String email) {
-        User user = null;
-        try {
-            user = this.userDBRepository.findByEmail(email);
-            if (user == null) {
-                throw new Exception("There is no user with email: " + email);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        User user = this.userDBRepository.findByEmail(email);
+        this.saveUserToCache(user);
         return user;
     }
 
     // Find all users' operation.
-    @Override
-    public Map<String, User> findAll() {
-        return hashOperations.entries(USER_CACHE);
+    public List<User> findAll() {
+        List<User> users = hashOperations.values(USER_CACHE);
+
+        if (!users.isEmpty()){
+            return users;
+        }
+
+        return this.userDBRepository.findAll();
     }
 
     // Delete user by email operation.
-    @Override
-    public void delete(String email) {
+    public void deleteByEmail(String email) {
         hashOperations.delete(USER_CACHE, email);
+        this.userDBRepository.deleteByEmail(email);
     }
 }
