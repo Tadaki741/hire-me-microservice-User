@@ -3,6 +3,7 @@ package com.example.hirememicroserviceUser.controller;
 
 import com.example.hirememicroserviceUser.model.LoginBody;
 import com.example.hirememicroserviceUser.model.User;
+import com.example.hirememicroserviceUser.service.AuthenticationService;
 import com.example.hirememicroserviceUser.service.UserService;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 public class UserController {
@@ -32,30 +34,36 @@ public class UserController {
 
 
     @PostMapping(path = "user/auth")
-    public String saveNewUserOrLogin(@RequestBody LoginBody IdTokenFromUser) {
+    public String saveNewUserOrLogin(@RequestBody LoginBody loginBody) {
         try {
-            //Get IdToken
-            String idToken = IdTokenFromUser.getIdToken();
-            //Decode IdToken
+            //Get the idToken from the login body
+            String idToken = loginBody.getIdToken();
+
+            //Decode it
             FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(idToken);
-            //Get the email from IdToken
-            String email = decodedToken.getEmail();
+
+            //Get the email
+            String userEmail = decodedToken.getEmail();
+
             //Find the email in database. The library for encode and decode is Apache Commons Code
             //If null, send back the JWT contains email + isRecruiter(null)
             //If user has registered, send back the JWT contains email + isRecruiter(user.getRecruiter())
-            if (findByEmail(email) == null) {
-                userService.save(new User(email, null));
-                String encodedString = email + null;
-                Base64 base64 = new Base64();
-                String jwtToken = new String(base64.encode(encodedString.getBytes()));
-                return jwtToken;
-            } else {
-                User user = findByEmail(email);
-                String encodedString = email + user.getRecruiter();
-                Base64 base64 = new Base64();
-                String jwtToken = new String(base64.encode(encodedString.getBytes()));
-                return jwtToken;
+
+            //Find the user
+            User findingUser = this.userService.findByEmail(userEmail);
+
+            if (findingUser == null){//User not exist in the database
+                //Initialize it and assign the value
+                findingUser = new User(userEmail,false);
+
+                //Save this user to the database
+                this.userService.save(findingUser);
             }
+
+            //Then we generate the JWT token to send back to the front end
+            return AuthenticationService.generateToken(findingUser);
+
+
         } catch (FirebaseAuthException e) {
             //Send back error for invalid IdToken
             throw new ResponseStatusException(HttpStatus.SC_UNAUTHORIZED, "Invalid Token ID!", e);

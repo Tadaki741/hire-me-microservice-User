@@ -2,8 +2,7 @@ package com.example.hirememicroserviceUser.securityFilter;
 
 
 import com.example.hirememicroserviceUser.service.AuthenticationService;
-import com.google.firebase.auth.FirebaseAuthException;
-import org.apache.http.HttpStatus;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -20,50 +19,38 @@ public class LoginFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) {
-        logger.info("--> init() method has been get invoked");
-        logger.info("--> Filter name is " + filterConfig.getFilterName());
-        logger.info("--> ServletContext name is" + filterConfig.getServletContext());
-        logger.info("--> init() method is ended");
+        logger.info(" --> init() method has been get invoked");
+        logger.info(" --> Filter name is " + filterConfig.getFilterName());
+        logger.info(" --> ServletContext name is" + filterConfig.getServletContext());
+        logger.info(" --> init() method is ended");
     }
 
     @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException, IOException {
-        logger.info("--> doFilter() method is invoked");
-
-        //Handling incoming request
+    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+        logger.info(" --> Inside doFilter() of LoginFilter class !!! <--");
+        logger.info(" --> doFilter() method is invoked");
         HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
         HttpServletResponse httpServletResponse = (HttpServletResponse) servletResponse;
+        logger.info(" --> filterChain is working wow");
 
-        logger.info("--> filterChain function working");
-        try {
-            //filter request that has a void body
-            filterChain.doFilter(httpServletRequest, httpServletResponse);
-
-
-            //Use the firebase auth to decode the token
-            String userDecodedID = AuthenticationService.getAuthentication((HttpServletRequest) servletRequest);
-
-            //If the userDecoded is null, meaning that firebase could not verify that token,
-            //Hence the user has provided the incorrect ID
-            if (userDecodedID != null){
-                logger.info("user's firebase token is not null ! Valid request");
-            }
-
-        } catch (ServletException | IOException e) {
-            throw new ResponseStatusException(HttpStatus.SC_FORBIDDEN, "The body is void", e);
-        } catch (FirebaseAuthException e) {
-            throw new ResponseStatusException(HttpStatus.SC_FORBIDDEN, "Invalid token ID", e);
+        //Check for the incoming header if it has the token id
+        String headerToken = AuthenticationService.extractTokenStringFromHeader(httpServletRequest);
+        if (headerToken != null) {
+            //If the request has body
+            filterChain.doFilter(httpServletRequest, httpServletResponse); //This will make the program jump into the UserController.java
         }
 
-        logger.info("--> filterChain fucntion ended");
+        else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Bearer Token not found !",null);
+        }
 
-
-        logger.info("--> doFilter() method is ended");
+        logger.info(" --> filterChain is ending wow");
+        logger.info(" --> doFilter() method is ended");
     }
 
     @Override
     public void destroy() {
-        logger.info("--> destroy() method is invoked");
+        logger.info(" --> destroy() method is invoked");
     }
 
 

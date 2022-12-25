@@ -1,32 +1,29 @@
 package com.example.hirememicroserviceUser.service;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthException;
-import com.google.firebase.auth.FirebaseToken;
-import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
+import com.example.hirememicroserviceUser.model.User;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
+import java.util.Map;
 
 public class AuthenticationService {
 
-    static final long EXPIRATIONTIME = 864_000_00; // equal 1 day in milliseconds
-    static final String SIGNINGKEY = "SecretKey";
+    static final long JWT_EXPIRATION = 864_000_00; // equal 1 day in milliseconds
+    static final String JWT_SECRET = "SecretKey";
 
     static final String PREFIX = "Bearer";
 
-    //Add the information back to the header so that we can send to the front-end
-    public static void addToken(HttpServletResponse res, String username){
+    //Currently this function is not in use
+    public static void addToken(HttpServletResponse res, String email){
 
-//these comments code are from Java 17
-//        String JwtToken = Jwt.builder().setSubject(username)
-//                //Set the expiration time, add 1 day time
-//                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATIONTIME))
-//                .signWith(SignatureAlgorithm.HS512, SIGNINGKEY) // changed from HS512 to HS256 makes the application works ? will look more in to this
-//                .compact();
-
-        String JwtToken = "";
+        String JwtToken = Jwts.builder().setSubject(email)
+                //Set the expiration time, add 1 day time
+                .setExpiration(new Date(System.currentTimeMillis() + JWT_EXPIRATION))
+                .signWith(SignatureAlgorithm.HS512, JWT_SECRET) // changed from HS512 to HS256 makes the application works ? will look more in to this
+                .compact();
 
         res.addHeader("Authorization", PREFIX + " " + JwtToken);
 
@@ -35,27 +32,33 @@ public class AuthenticationService {
     }
 
 
-    //Function to extract the user id from the front-end request
-    public static String getAuthentication (HttpServletRequest request) throws FirebaseAuthException {
-        String token = request.getHeader("Authorization");// The name "Authorization" is a special name constant
+    //Function to check if the incoming header has the token or not
+    public static String extractTokenStringFromHeader(HttpServletRequest request){
+        String requestHeader = request.getHeader("Authorization"); //Authorization is a constant naming convention
 
+        //Split the bearer and the tokenID
+        try {
+            String[] headerElement = requestHeader.split(" ");
 
-        //If the user has a token
-        if(token != null){
-
-            //Extract the data: element 0 = "Bearer" - element 1 = tokenIDString
-            String[] dataArray = token.split(" ");
-            String userToken = dataArray[1];
-
-            //Use firebase to extract the data from the tokenIDString
-            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(userToken);
-
-            //If the user has the data
-            return decodedToken.getUid();
-
-
+            //Get the token
+            return headerElement[1];
         }
-        return null;
+        catch (NullPointerException e){
+            return null;
+        }
+
+    }
+
+    public static String generateToken(User user) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + JWT_EXPIRATION);
+        return Jwts.builder()
+                .setSubject(user.getEmail())
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
+                .setClaims(Map.of("email", user.getEmail(), "isRecruiter", user.getIsRecruiter()))
+                .signWith(SignatureAlgorithm.HS512, JWT_SECRET)
+                .compact();
     }
 
 
