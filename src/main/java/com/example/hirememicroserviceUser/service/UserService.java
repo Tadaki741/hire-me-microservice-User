@@ -41,14 +41,16 @@ public class UserService {
     }
 
     public void saveUserToCache(final User user) {
-        hashOperations.put(USER_CACHE, user.getId(), user);
+        hashOperations.put(USER_CACHE, user.getEmail(), user);
     }
 
     public User findByEmail(String email) {
         User redisUser = hashOperations.get(USER_CACHE, email);
         if (redisUser != null) return redisUser;
         User user = this.userDBRepository.findByEmail(email);
-        this.saveUserToCache(user);
+        if (user == null) {
+            return null;
+        }
         return user;
     }
 

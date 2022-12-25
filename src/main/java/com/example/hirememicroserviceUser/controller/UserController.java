@@ -34,11 +34,12 @@ public class UserController {
 
 
     @PostMapping(path = "user/auth")
-    public String saveNewUserOrLogin(@RequestBody LoginBody loginBody) {
+    public String saveNewUserOrLogin(@RequestHeader (name="Authorization") String loginBody) {
         try {
             //Get the idToken from the login body
-            String idToken = loginBody.getIdToken();
-
+//            String idToken = loginBody.getIdToken();
+            String[] a = loginBody.split(" ");
+            String idToken = a[1];
             //Decode it
             FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(idToken);
 
@@ -54,7 +55,7 @@ public class UserController {
 
             if (findingUser == null){//User not exist in the database
                 //Initialize it and assign the value
-                findingUser = new User(userEmail,false);
+                findingUser = new User(userEmail,null);
 
                 //Save this user to the database
                 this.userService.save(findingUser);
