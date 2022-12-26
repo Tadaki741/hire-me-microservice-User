@@ -52,6 +52,7 @@ public class AuthenticationService {
     public static String generateToken(User user) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + JWT_EXPIRATION);
+        System.out.println(user.toString());
         return Jwts.builder()
                 .setSubject(user.getEmail())
                 .setIssuedAt(now)

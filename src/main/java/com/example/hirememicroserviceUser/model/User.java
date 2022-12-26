@@ -14,6 +14,7 @@ import java.io.Serializable;
 @Table(name = "users")
 @Setter
 @Getter
+@ToString
 public class User implements Serializable {
     private static final long serialVersionUID = 6529685098267757690L;
     @Id

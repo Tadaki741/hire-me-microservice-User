@@ -59,11 +59,9 @@ public class UserController {
             User findingUser = this.userService.findByEmail(userEmail);
 
             if (findingUser == null){//User not exist in the database
-                //Initialize it and assign the value
-                findingUser = new User(userEmail,null);
 
                 //Save this user to the database
-                this.userService.save(findingUser);
+                findingUser = this.userService.save(new User(userEmail,false));
             }
 
             //Then we generate the JWT token to send back to the front end
