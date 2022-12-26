@@ -7,27 +7,36 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
+
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.Objects;
 
 @SpringBootApplication
 @EnableConfigurationProperties
 public class HireMeMicroserviceUserApplication {
 
-	public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException {
 
-		//Initialize firebase sdk
-		ClassLoader classLoader = HireMeMicroserviceUserApplication.class.getClassLoader();
-        InputStream serviceAccount = classLoader.getResourceAsStream("serviceAccountKey.json");
+        try {
+            //Initialize the firebase SDK
+            ClassLoader classLoader = HireMeMicroserviceUserApplication.class.getClassLoader();
+            File file = new File(Objects.requireNonNull(classLoader.getResource("serviceAccountKey.json")).getFile());
+            FileInputStream serviceAccount = new FileInputStream(file.getAbsolutePath());
 
-		//Firebase
-		FirebaseOptions options = FirebaseOptions.builder()
-						.setCredentials(GoogleCredentials.fromStream(serviceAccount))
-								.build();
+            FirebaseOptions options = FirebaseOptions.builder()
+                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                    .build();
 
-		FirebaseApp.initializeApp(options);
+            FirebaseApp.initializeApp(options);
+        } catch (FileNotFoundException e) {
+            System.out.println("JSON FILE NOT FOUND !!!");
+        }
 
-		SpringApplication.run(HireMeMicroserviceUserApplication.class, args);
-	}
+
+        SpringApplication.run(HireMeMicroserviceUserApplication.class, args);
+    }
 
 }
