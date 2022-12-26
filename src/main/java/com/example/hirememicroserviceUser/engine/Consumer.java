@@ -21,12 +21,8 @@ public class Consumer {
     @KafkaListener(topics = "users", groupId = "group_id")
     public void consume(User user) throws IOException {
         logger.info(String.format("#### -> Consumed user -> %s", user));
-
         //save message to database
-        User newUser = new User(user.getEmail(),user.getIsRecruiter());
-
-        this.userService.save(newUser);
-
+        User newUser = this.userService.save(user);
         logger.info(String.format("#### -> New user created -> %s", newUser.getId()));
 
     }
