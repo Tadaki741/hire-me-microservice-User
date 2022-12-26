@@ -32,6 +32,11 @@ public class UserController {
         return "Test2";
     }
 
+    @PostMapping()
+    public User insertUser(@RequestBody User user) {
+        return userService.save(user);
+    }
+
 
     @PostMapping(path = "user/auth")
     public String saveNewUserOrLogin(@RequestHeader (name="Authorization") String loginBody) {

@@ -7,15 +7,16 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+
+import java.io.*;
+
 import java.util.Objects;
 import java.util.logging.Logger;
 
 @SpringBootApplication
+@EnableConfigurationProperties
 public class HireMeMicroserviceUserApplication {
 
     private static final Logger logger = Logger.getLogger(HireMeMicroserviceUserApplication.class.getName());
@@ -32,8 +33,8 @@ public class HireMeMicroserviceUserApplication {
             try {
                 //Initialize the firebase SDK
                 ClassLoader classLoader = HireMeMicroserviceUserApplication.class.getClassLoader();
-                File file = new File(Objects.requireNonNull(classLoader.getResource("serviceAccountKey.json")).getFile());
-                FileInputStream serviceAccount = new FileInputStream(file.getAbsolutePath());
+                InputStream serviceAccount = classLoader.getResourceAsStream("serviceAccountKey.json");
+
 
                 FirebaseOptions options = FirebaseOptions.builder()
                         .setCredentials(GoogleCredentials.fromStream(serviceAccount))
