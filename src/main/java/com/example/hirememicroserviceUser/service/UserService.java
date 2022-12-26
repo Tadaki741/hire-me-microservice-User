@@ -26,18 +26,18 @@ public class UserService {
     // This annotation makes sure that the method needs to be executed after
     // dependency injection is done to perform any initialization.
     @PostConstruct
-    private void intializeHashOperations() {
+    private void initializeHashOperations() {
         hashOperations = redisTemplate.opsForHash();
     }
 
     // Save operation.
-    public void save(final User user) {
-
+    public User save(final User user) {
+        User newUser = this.userDBRepository.save(user);
         //Update data to redis
-        this.saveUserToCache(user);
+        this.saveUserToCache(newUser);
 
         //save to database
-        this.userDBRepository.save(user);
+        return newUser;
     }
 
     public void saveUserToCache(final User user) {

@@ -20,3 +20,13 @@ docker-compose up --build
 `mvn clean && mvn package` is to clean and rebuild jar file
 
 `docker-compose up --build` is to rebuild the docker image
+
+# How to dev on local
+
+Go to `application.properties`
+- Change `spring.datasource.url=jdbc:postgresql://localhost:25432/microservice-user`
+
+Go to `application.yml`
+- Change `spring.kafka.consumer.bootstrap-servers` to `localhost:19092`
+- Change `spring.kafka.producer.bootstrap-servers` to `localhost:19092`
+- Change `spring.redis.host` to `localhost`
