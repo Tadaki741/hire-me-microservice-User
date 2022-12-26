@@ -8,11 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 
-import java.io.IOException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.Objects;
+import java.io.*;
 
 @SpringBootApplication
 @EnableConfigurationProperties
@@ -23,8 +19,7 @@ public class HireMeMicroserviceUserApplication {
         try {
             //Initialize the firebase SDK
             ClassLoader classLoader = HireMeMicroserviceUserApplication.class.getClassLoader();
-            File file = new File(Objects.requireNonNull(classLoader.getResource("serviceAccountKey.json")).getFile());
-            FileInputStream serviceAccount = new FileInputStream(file.getAbsolutePath());
+            InputStream serviceAccount = classLoader.getResourceAsStream("serviceAccountKey.json");
 
             FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
