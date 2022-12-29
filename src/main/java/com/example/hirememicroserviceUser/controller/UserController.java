@@ -36,7 +36,7 @@ public class UserController {
     }
 
     @PostMapping(path = "/auth")
-    public String saveNewUserOrLogin(@RequestBody LoginBody loginBody) {
+    public ResponseEntity<ResponseBody> saveNewUserOrLogin(@RequestBody LoginBody loginBody) {
         try {
             //Get the idToken from the login body
             String idToken = loginBody.getIdToken();
@@ -55,9 +55,11 @@ public class UserController {
             if (findingUser == null){
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User with email " + userEmail + " has not registered!");
             }
+            String accessToken = AuthenticationService.generateToken(findingUser);
+            ResponseBody body = new ResponseBody(accessToken);
 
             //Then we generate the JWT token to send back to the front end
-            return AuthenticationService.generateToken(findingUser);
+            return new ResponseEntity<>(body, HttpStatus.CREATED);
 
 
         } catch (FirebaseAuthException e) {
@@ -82,7 +84,7 @@ public class UserController {
 
         if (user == null){
             ResponseBody body = new ResponseBody(null, new ResponseError("User doesn't exist", 404));
-            return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(body, HttpStatus.OK);
         }
         ResponseBody body = new ResponseBody(user);
         return new ResponseEntity<>(body, HttpStatus.OK);
