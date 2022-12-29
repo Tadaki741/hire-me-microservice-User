@@ -5,6 +5,7 @@ import com.example.hirememicroserviceUser.model.User;
 import com.example.hirememicroserviceUser.service.AuthenticationService;
 import io.jsonwebtoken.Jwts;
 import lombok.NonNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -22,28 +23,39 @@ import java.util.logging.Logger;
 public class LoginFilter extends OncePerRequestFilter {
     @Value("${JWT_SECRET_KEY}")
     private String secretKey;
+
+    public void setSecretKey(String secretKey) {
+        this.secretKey = secretKey;
+    }
+
+    @Autowired
+    AuthenticationService authenticationService;
+
     private static final Logger logger = Logger.getLogger(LoginFilter.class.getName());
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
+        String method = request.getMethod().toUpperCase();
+
         boolean isGetUserEmailPath = path.matches("/users/email/(.*?)");
         boolean isGenerateJWTPath = "/users/auth".equals(path);
         boolean isTestPath = "/users/test".equals(path);
-        return isGetUserEmailPath || isGenerateJWTPath || isTestPath;
+        boolean isRegisterUserPath = "/users".equals(path) && (method.equals("POST") || method.equals("OPTIONS"));
+
+        return isGetUserEmailPath || isGenerateJWTPath || isTestPath || isRegisterUserPath;
     }
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
-        String headerToken = AuthenticationService.extractTokenStringFromHeader(request);
+        String headerToken = authenticationService.extractTokenStringFromHeader(request);
         if (headerToken == null) {
             response.sendError(HttpStatus.UNAUTHORIZED.value(), "Invalid JWT");
             return;
         }
 
-        // TODO: decode and validate jwt token here
         try {
-            String validation = AuthenticationService.decodeJWTToken(headerToken);
+            String validation = authenticationService.decodeJWTToken(headerToken);
             if (validation == null) {
                 response.sendError(HttpStatus.UNAUTHORIZED.value(), "JWT NOT VALIDATED");
                 return;

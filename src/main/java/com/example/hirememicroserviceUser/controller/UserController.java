@@ -24,11 +24,15 @@ import java.util.Map;
 @RequestMapping("users")
 @CrossOrigin(origins = "*")
 public class UserController {
-
     private static final Logger LOG = LoggerFactory.getLogger(UserController.class);
+    private final UserService userService;
+    private final AuthenticationService authenticationService;
 
     @Autowired
-    UserService userService;
+    public UserController(UserService userService, AuthenticationService authenticationService) {
+        this.userService = userService;
+        this.authenticationService = authenticationService;
+    }
 
     @GetMapping(path = "/test")
     public String test() {
@@ -52,10 +56,10 @@ public class UserController {
             User findingUser = this.userService.findByEmail(userEmail);
 
             //User not exist in the database
-            if (findingUser == null){
+            if (findingUser == null) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User with email " + userEmail + " has not registered!");
             }
-            String accessToken = AuthenticationService.generateToken(findingUser);
+            String accessToken = authenticationService.generateToken(findingUser);
             ResponseBody body = new ResponseBody(accessToken);
 
             //Then we generate the JWT token to send back to the front end
@@ -82,7 +86,7 @@ public class UserController {
         LOG.info("Fetching employee with email = " + email);
         User user = userService.findByEmail(email);
 
-        if (user == null){
+        if (user == null) {
             ResponseBody body = new ResponseBody(null, new ResponseError("User doesn't exist", 404));
             return new ResponseEntity<>(body, HttpStatus.OK);
         }
@@ -90,8 +94,9 @@ public class UserController {
         return new ResponseEntity<>(body, HttpStatus.OK);
     }
 
+    @CrossOrigin
     @PostMapping()
-    public ResponseEntity<ResponseBody> insert(@RequestBody User user){
+    public ResponseEntity<ResponseBody> insert(@RequestBody User user) {
         User newUser = userService.save(user);
         ResponseBody body = new ResponseBody(newUser);
         return new ResponseEntity<>(body, HttpStatus.OK);

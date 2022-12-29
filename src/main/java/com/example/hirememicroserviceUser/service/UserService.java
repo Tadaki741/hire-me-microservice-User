@@ -13,12 +13,15 @@ import java.util.List;
 @Service
 public class UserService {
     private final String USER_CACHE = "USER";
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final UserDBRepository userDBRepository;
 
     @Autowired
-    RedisTemplate<String, Object> redisTemplate;
+    public UserService(UserDBRepository userDBRepository, RedisTemplate<String, Object> redisTemplate){
+        this.redisTemplate = redisTemplate;
+        this.userDBRepository = userDBRepository;
 
-    @Autowired
-    UserDBRepository userDBRepository;
+    }
 
     //Define the parameters of operation: USER_CACHE, EMAIL, USER
     private HashOperations<String, String, User> hashOperations;
