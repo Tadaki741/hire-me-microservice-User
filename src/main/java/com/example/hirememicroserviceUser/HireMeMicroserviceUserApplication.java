@@ -12,7 +12,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 
 import java.io.*;
 
-import java.util.Objects;
 import java.util.logging.Logger;
 
 @SpringBootApplication
@@ -34,7 +33,6 @@ public class HireMeMicroserviceUserApplication {
                 //Initialize the firebase SDK
                 ClassLoader classLoader = HireMeMicroserviceUserApplication.class.getClassLoader();
                 InputStream serviceAccount = classLoader.getResourceAsStream("serviceAccountKey.json");
-
 
                 FirebaseOptions options = FirebaseOptions.builder()
                         .setCredentials(GoogleCredentials.fromStream(serviceAccount))
