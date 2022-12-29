@@ -48,16 +48,12 @@ public class UserController {
             String userEmail = decodedToken.getEmail();
 
             //Find the email in database. The library for encode and decode is Apache Commons Code
-            //If null, send back the JWT contains email + isRecruiter(null)
-            //If user has registered, send back the JWT contains email + isRecruiter(user.getRecruiter())
-
             //Find the user
             User findingUser = this.userService.findByEmail(userEmail);
 
-            if (findingUser == null){//User not exist in the database
-
-                //Save this user to the database
-                findingUser = this.userService.save(new User(userEmail,false));
+            //User not exist in the database
+            if (findingUser == null){
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User with email " + userEmail + " has not registered!");
             }
 
             //Then we generate the JWT token to send back to the front end
