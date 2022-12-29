@@ -1,11 +1,8 @@
 package com.example.hirememicroserviceUser.securityFilter;
 
 
-import com.example.hirememicroserviceUser.model.User;
 import com.example.hirememicroserviceUser.service.AuthenticationService;
-import io.jsonwebtoken.Jwts;
 import lombok.NonNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -15,8 +12,6 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Base64;
-import java.util.Map;
 import java.util.logging.Logger;
 
 @Component
@@ -24,12 +19,15 @@ public class LoginFilter extends OncePerRequestFilter {
     @Value("${JWT_SECRET_KEY}")
     private String secretKey;
 
+    public LoginFilter(AuthenticationService authenticationService) {
+        this.authenticationService = authenticationService;
+    }
+
     public void setSecretKey(String secretKey) {
         this.secretKey = secretKey;
     }
 
-    @Autowired
-    AuthenticationService authenticationService;
+    private AuthenticationService authenticationService;
 
     private static final Logger logger = Logger.getLogger(LoginFilter.class.getName());
 

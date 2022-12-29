@@ -53,7 +53,6 @@ public class AuthenticationService {
     //Function to check if the incoming header has the token or not
     public String extractTokenStringFromHeader(HttpServletRequest request){
         String requestHeader = request.getHeader("Authorization"); //Authorization is a constant naming convention
-
         //Split the bearer and the tokenID
         try {
             String[] headerElement = requestHeader.split(" ");
@@ -99,8 +98,10 @@ public class AuthenticationService {
         if (!validator.isValid(tokenWithoutSignature, signature)) {
             return null;
         }
+        System.out.println(header);
+        System.out.println(payload);
         //return header and payload
-        return header + " " + payload;
+        return payload;
     }
 
 }
