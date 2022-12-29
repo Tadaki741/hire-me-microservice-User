@@ -2,9 +2,10 @@ package com.example.hirememicroserviceUser.securityFilter;
 
 
 import com.example.hirememicroserviceUser.service.AuthenticationService;
+import lombok.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -13,39 +14,29 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 @Component
-public class LoginFilter implements Filter {
+public class LoginFilter extends OncePerRequestFilter {
 
     private static final Logger logger = Logger.getLogger(LoginFilter.class.getName());
 
     @Override
-    public void init(FilterConfig filterConfig) {
-        logger.info(" --> init() method has been get invoked");
-        logger.info(" --> Filter name is " + filterConfig.getFilterName());
-        logger.info(" --> ServletContext name is" + filterConfig.getServletContext());
-        logger.info(" --> init() method is ended");
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getRequestURI();
+        boolean isGetUserEmailPath = path.matches("/users/email/(.*?)");
+        boolean isGenerateJWTPath = "/users/auth".equals(path);
+        boolean isTestPath = "/users/test".equals(path);
+        return isGetUserEmailPath || isGenerateJWTPath || isTestPath;
     }
 
     @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        logger.info(" --> Inside doFilter() of LoginFilter class !!! <--");
-        logger.info(" --> doFilter() method is invoked");
-        HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
-        HttpServletResponse httpServletResponse = (HttpServletResponse) servletResponse;
-        logger.info(" --> filterChain is working wow");
-
-        //Check for the incoming header if it has the token id
-        String headerToken = AuthenticationService.extractTokenStringFromHeader(httpServletRequest);
-        if (headerToken != null) {
-            //If the request has body
-            filterChain.doFilter(httpServletRequest, httpServletResponse); //This will make the program jump into the UserController.java
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
+        String headerToken = AuthenticationService.extractTokenStringFromHeader(request);
+        if (headerToken == null){
+            response.sendError(HttpStatus.UNAUTHORIZED.value(), "Invalid JWT");
+            return;
         }
 
-        else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Bearer Token not found !",null);
-        }
-
-        logger.info(" --> filterChain is ending wow");
-        logger.info(" --> doFilter() method is ended");
+        // TODO: decode and validate jwt token here
+        filterChain.doFilter(request, response);
     }
 
     @Override
