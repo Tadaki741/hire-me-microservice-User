@@ -76,8 +76,8 @@ public class UserController {
     @GetMapping()
     public List<User> findAll() {
         LOG.info("Fetching all users from the redis.");
-        List<User> userMap = userService.findAll();
-        return userMap;
+        final List<User> users = userService.findAll();
+        return users;
     }
 
     // Get user by email
