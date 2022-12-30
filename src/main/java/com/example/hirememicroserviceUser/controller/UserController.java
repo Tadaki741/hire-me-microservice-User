@@ -74,10 +74,11 @@ public class UserController {
 
     // Get all users by email
     @GetMapping()
-    public List<User> findAll() {
+    public ResponseEntity<ResponseBody> findAll() {
         LOG.info("Fetching all users from the redis.");
         final List<User> users = userService.findAll();
-        return users;
+        ResponseBody body = new ResponseBody(users);
+        return new ResponseEntity<>(body, HttpStatus.OK);
     }
 
     // Get user by email
