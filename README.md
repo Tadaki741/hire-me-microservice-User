@@ -22,11 +22,4 @@ docker-compose up --build
 `docker-compose up --build` is to rebuild the docker image
 
 # How to dev on local
-
-Go to `application.properties`
-- Change `spring.datasource.url=jdbc:postgresql://localhost:25432/microservice-user`
-
-Go to `application.yml`
-- Change `spring.kafka.consumer.bootstrap-servers` to `localhost:19092`
-- Change `spring.kafka.producer.bootstrap-servers` to `localhost:19092`
-- Change `spring.redis.host` to `localhost`
+Run `mvn clean && mvn package -D skipTests && docker-compose up --build` and start local spring boot app.
