@@ -21,15 +21,12 @@ import java.util.logging.Logger;
 
 @Component
 public class LoginFilter extends OncePerRequestFilter {
-    @Value("${JWT_SECRET_KEY}")
-    private String secretKey;
-
-    public void setSecretKey(String secretKey) {
-        this.secretKey = secretKey;
-    }
+    private final AuthenticationService authenticationService;
 
     @Autowired
-    AuthenticationService authenticationService;
+    public LoginFilter(AuthenticationService authenticationService) {
+        this.authenticationService = authenticationService;
+    }
 
     private static final Logger logger = Logger.getLogger(LoginFilter.class.getName());
 
@@ -55,8 +52,7 @@ public class LoginFilter extends OncePerRequestFilter {
         }
 
         try {
-            String validation = authenticationService.decodeJWTToken(headerToken);
-            if (validation == null) {
+            if (!authenticationService.isValidToken(headerToken)) {
                 response.sendError(HttpStatus.UNAUTHORIZED.value(), "JWT NOT VALIDATED");
                 return;
             }

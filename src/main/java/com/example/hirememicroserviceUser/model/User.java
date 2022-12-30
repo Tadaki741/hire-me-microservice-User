@@ -22,7 +22,7 @@ public class User implements Serializable {
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(name = "id",nullable = false)
     private String id;
-    @Column
+    @Column(unique = true)
     private String email;
     @Column
     private Boolean isRecruiter;
@@ -51,11 +51,11 @@ public class User implements Serializable {
         this.email = email;
     }
 
-    public Boolean getRecruiter() {
+    public Boolean getIsRecruiter() {
         return isRecruiter;
     }
 
-    public void setRecruiter(Boolean recruiter) {
+    public void setIsRecruiter(Boolean recruiter) {
         isRecruiter = recruiter;
     }
 }

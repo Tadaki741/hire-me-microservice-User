@@ -18,7 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Map;
+import java.util.List;
 
 @RestController()
 @RequestMapping("users")
@@ -73,10 +73,10 @@ public class UserController {
     }
 
     // Get all users by email
-    @GetMapping("/getall")
-    public Map<String, User> findAll() {
+    @GetMapping()
+    public List<User> findAll() {
         LOG.info("Fetching all users from the redis.");
-        final Map<String, User> userMap = (Map<String, User>) userService.findAll();
+        List<User> userMap = userService.findAll();
         return userMap;
     }
 
@@ -104,12 +104,10 @@ public class UserController {
 
     // Delete user by email.
     @DeleteMapping("/delete/{email}")
-    public Map<String, User> delete(@PathVariable("email") final String email) {
+    public void delete(@PathVariable("email") final String email) {
         LOG.info("Deleting employee with id = " + email);
         // Deleting the user.
         userService.deleteByEmail(email);
-        // Returning the all users (post the deleted one).
-        return findAll();
     }
 
 
