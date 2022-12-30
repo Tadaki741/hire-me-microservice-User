@@ -1,19 +1,14 @@
 package com.example.hirememicroserviceUser.service;
 
 import com.example.hirememicroserviceUser.model.User;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.impl.crypto.DefaultJwtSignatureValidator;
+import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
 
@@ -79,29 +74,23 @@ public class AuthenticationService {
                 .compact();
     }
 
-    public String decodeJWTToken(String token) throws Exception {
-        //Extract header and payload in JWT
-        String[] jwt = token.split("\\.");
-        Base64.Decoder decoder = Base64.getUrlDecoder();
-        String header = new String(decoder.decode(jwt[0]));
-        String payload = new String(decoder.decode(jwt[1]));
-
-        String tokenWithoutSignature = jwt[0] + "." + jwt[1];
-        String signature = jwt[2];
-
-        //Validation part
-        SignatureAlgorithm sa = HS256;
-        SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(), sa.getJcaName());
-
-        DefaultJwtSignatureValidator validator = new DefaultJwtSignatureValidator(sa, secretKeySpec);
-        //If token is not validated, return null
-        if (!validator.isValid(tokenWithoutSignature, signature)) {
-            return null;
+    public boolean isValidToken(String token) throws Exception {
+        try {
+            Jwts.parser().setSigningKey(this.secretKey).parseClaimsJws(token);
+            return true;
+        } catch (SignatureException e) {
+            LOG.error("Invalid JWT signature: {}", e.getMessage());
+        } catch (MalformedJwtException e) {
+            LOG.error("Invalid JWT token: {}", e.getMessage());
+        } catch (ExpiredJwtException e) {
+            LOG.error("JWT token is expired: {}", e.getMessage());
+        } catch (UnsupportedJwtException e) {
+            LOG.error("JWT token is unsupported: {}", e.getMessage());
+        } catch (IllegalArgumentException e) {
+            LOG.error("JWT claims string is empty: {}", e.getMessage());
         }
-        System.out.println(header);
-        System.out.println(payload);
-        //return header and payload
-        return payload;
+
+        return false;
     }
 
 }

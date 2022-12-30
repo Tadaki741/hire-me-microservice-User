@@ -3,6 +3,8 @@ package com.example.hirememicroserviceUser.securityFilter;
 
 import com.example.hirememicroserviceUser.service.AuthenticationService;
 import lombok.NonNull;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -18,7 +20,9 @@ import java.util.logging.Logger;
 public class LoginFilter extends OncePerRequestFilter {
     @Value("${JWT_SECRET_KEY}")
     private String secretKey;
+    private final AuthenticationService authenticationService;
 
+    @Autowired
     public LoginFilter(AuthenticationService authenticationService) {
         this.authenticationService = authenticationService;
     }
@@ -27,7 +31,6 @@ public class LoginFilter extends OncePerRequestFilter {
         this.secretKey = secretKey;
     }
 
-    private AuthenticationService authenticationService;
 
     private static final Logger logger = Logger.getLogger(LoginFilter.class.getName());
 
@@ -53,8 +56,7 @@ public class LoginFilter extends OncePerRequestFilter {
         }
 
         try {
-            String validation = authenticationService.decodeJWTToken(headerToken);
-            if (validation == null) {
+            if (!authenticationService.isValidToken(headerToken)) {
                 response.sendError(HttpStatus.UNAUTHORIZED.value(), "JWT NOT VALIDATED");
                 return;
             }
