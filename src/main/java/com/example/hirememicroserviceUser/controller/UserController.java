@@ -36,7 +36,7 @@ public class UserController {
 
     @GetMapping(path = "/test")
     public String test() {
-        return "Test2";
+        return "Test from users";
     }
 
     @PostMapping(path = "/auth")
@@ -111,5 +111,27 @@ public class UserController {
         userService.deleteByEmail(email);
     }
 
+    //HANDLING REQUEST FROM MICROSERVICE-CV
+    @PostMapping(path = "/verify")
+    public ResponseEntity<ResponseBody> verifyTokenRequest(@RequestParam(name = "token") String token){
+
+        try {
+            //Decode the token to see if it is correct
+            boolean isLegit = authenticationService.isValidToken(token);
+
+            //Prepare body
+            ResponseBody responseBody = new ResponseBody(isLegit);
+
+            //return it
+            return new ResponseEntity<>(responseBody, HttpStatus.OK);
+
+        }
+
+        catch (Exception e){
+            LOG.error(" --> isValidToken produced error");
+            return new ResponseEntity<>(null,HttpStatus.CONFLICT);
+        }
+
+    }
 
 }
