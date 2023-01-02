@@ -44,7 +44,11 @@ public class LoginFilter extends OncePerRequestFilter {
         boolean isTestPath = "/users/test".equals(path);
         boolean isRegisterUserPath = "/users".equals(path) && (method.equals("POST") || method.equals("OPTIONS"));
 
-        return isGetUserEmailPath || isGenerateJWTPath || isTestPath || isRegisterUserPath;
+        //Allow http request from microservice-CV
+        boolean isVerifyIdToken = "/users/verify".equals(path);
+
+
+        return isGetUserEmailPath || isGenerateJWTPath || isTestPath || isRegisterUserPath || isVerifyIdToken;
     }
 
     @Override

@@ -113,15 +113,17 @@ public class UserController {
 
     //HANDLING REQUEST FROM MICROSERVICE-CV
     @PostMapping(path = "/verify")
-    public ResponseEntity<ResponseBody> verifyTokenRequest(@RequestParam(name = "token") String token){
+    public ResponseEntity<ResponseBody> verifyTokenRequest(@RequestBody LoginBody verifyRequest){
 
         try {
+            LOG.warn("loginbody: " + verifyRequest.toString());
             //Decode the token to see if it is correct
-            boolean isLegit = authenticationService.isValidToken(token);
-
+            LOG.info(" --o idToken value: " + verifyRequest.getIdToken());
+            boolean isLegit = authenticationService.isValidToken(verifyRequest.getIdToken());
+            LOG.info(" --> isLegit status: " +  isLegit);
             //Prepare body
             ResponseBody responseBody = new ResponseBody(isLegit);
-
+            LOG.info(" --> received a verify request ! inside verifyTokenRequest function () <--");
             //return it
             return new ResponseEntity<>(responseBody, HttpStatus.OK);
 

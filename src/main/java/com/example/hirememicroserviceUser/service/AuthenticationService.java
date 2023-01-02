@@ -76,6 +76,8 @@ public class AuthenticationService {
 
     public boolean isValidToken(String token) throws Exception {
         try {
+            LOG.info("inside isValidToken, checking token string: " + token);
+            LOG.info("TOKEN RECEIVED: " + token);
             Jwts.parser().setSigningKey(this.secretKey).parseClaimsJws(token);
             return true;
         } catch (SignatureException e) {
