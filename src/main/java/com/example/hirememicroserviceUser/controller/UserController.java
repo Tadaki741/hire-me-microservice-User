@@ -118,20 +118,16 @@ public class UserController {
         try {
             LOG.warn("loginbody: " + verifyRequest.toString());
             //Decode the token to see if it is correct
-            LOG.info(" --o idToken value: " + verifyRequest.getIdToken());
             boolean isLegit = authenticationService.isValidToken(verifyRequest.getIdToken());
-            LOG.info(" --> isLegit status: " +  isLegit);
+
             //Prepare body
             ResponseBody responseBody = new ResponseBody(isLegit);
-            LOG.info(" --> received a verify request ! inside verifyTokenRequest function () <--");
             //return it
             return new ResponseEntity<>(responseBody, HttpStatus.OK);
-
         }
-
         catch (Exception e){
             LOG.error(" --> isValidToken produced error");
-            return new ResponseEntity<>(null,HttpStatus.CONFLICT);
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         }
 
     }
