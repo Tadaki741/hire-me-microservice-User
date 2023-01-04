@@ -69,8 +69,9 @@ services:
       - SPRING_KAFKA_PRODUCER_VALUE_SERIALIZER=org.apache.kafka.common.serialization.StringSerializer
       - SPRING_REDIS_HOST=redis
       - SPRING_REDIS_PORT=6379
+      - SERVER_PORT=8080
     ports:
-      - "8081:8081"
+      - "8080:8080"
     depends_on:
       db:
         condition: service_healthy
