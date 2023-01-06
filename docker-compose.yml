@@ -6,7 +6,7 @@ services:
       POSTGRES_PASSWORD: 123456
       POSTGRES_DB: microservice-user
     volumes:
-      - postgres_db:/var/lib/postgresql/data
+      - postgres_db_user:/var/lib/postgresql/data
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 5s
@@ -14,42 +14,22 @@ services:
       retries: 5
     ports:
       - "25432:5432"
-  zoo:
-    image: confluentinc/cp-zookeeper:latest
-    hostname: zoo
-    container_name: zoo
-    ports:
-      - "2181:2181"
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_SERVER_ID: 1
-      ZOOKEEPER_SERVERS: zoo:2888:3888
+    networks:
+      user-network:
 
-  kafka:
-    image: confluentinc/cp-kafka:latest
-    hostname: kafka
-    container_name: kafka
-    ports:
-      - "9092:9092"
-      - "19092:19092"
-    environment:
-      KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka:9092, LISTENER_DOCKER_EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:19092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_DOCKER_INTERNAL
-      KAFKA_ZOOKEEPER_CONNECT: "zoo:2181"
-      KAFKA_BROKER_ID: 1
-      KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-    depends_on:
-      - zoo
   redis:
-    container_name: redis
+    container_name: redis-user
     image: redis
     ports:
       - "6379:6379"
+    networks:
+      user-network:
 
   hire-me-microservice-user:
     image: hire-me-microservice-user
+    networks:
+      hire-me-network:
+      user-network:
     build:
       context: .
       dockerfile: Dockerfile
@@ -60,13 +40,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD=123456
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
       - SPRING_KAFKA_CONSUMER_BOOTSTRAP_SERVERS=kafka:9092
-      - SPRING_KAFKA_CONSUMER_GROUP_ID=group_id
-      - SPRING_KAFKA_CONSUMER_AUTO_OFFSET_RESET=earliest
-      - SPRING_KAFKA_CONSUMER_KEY_DESERIALIZER=org.apache.kafka.common.serialization.StringDeserializer
-      - SPRING_KAFKA_CONSUMER_VALUE_DESERIALIZER=org.apache.kafka.common.serialization.StringDeserializer
       - SPRING_KAFKA_PRODUCER_BOOTSTRAP_SERVERS=kafka:9092
-      - SPRING_KAFKA_PRODUCER_KEY_SERIALIZER=org.apache.kafka.common.serialization.StringSerializer
-      - SPRING_KAFKA_PRODUCER_VALUE_SERIALIZER=org.apache.kafka.common.serialization.StringSerializer
       - SPRING_REDIS_HOST=redis
       - SPRING_REDIS_PORT=6379
       - SERVER_PORT=8080
@@ -77,6 +51,11 @@ services:
         condition: service_healthy
 
 volumes:
-  postgres_db:
-  kakfa:
-  zookeeper:
+  postgres_db_user:
+
+networks:
+  user-network:
+    driver: bridge
+  hire-me-network:
+    external: true
+    name: hire-me-network
