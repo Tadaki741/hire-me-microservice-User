@@ -51,8 +51,8 @@ public class UserService {
         User redisUser = hashOperations.get(USER_CACHE, email);
         if (redisUser != null) return redisUser;
         User user = this.userDBRepository.findByEmail(email);
-        if (user == null) {
-            return null;
+        if (user != null) {
+            this.saveUserToCache(user);
         }
         return user;
     }
